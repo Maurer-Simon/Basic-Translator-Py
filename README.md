@@ -5,7 +5,7 @@ This is a simple translator API that allows users to translate text between diff
 ## Requirements
 
 - Python 3.x
-- googletrans library (install using `pip install googletrans==4.0.0-rc1`)
+- deep_translator (install using `pip install -U deep-translator`)
 
 ## Usage
 
