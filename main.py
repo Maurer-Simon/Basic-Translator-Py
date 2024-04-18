@@ -4,120 +4,98 @@ import time
 
 class TranslatorApp:
     def __init__(self):
-        GoogleTranslator()
-        self.language_dict = GoogleTranslator().get_supported_languages(as_dict=True).items()
+        """Initialize the TranslatorApp object."""
+        self.translator = GoogleTranslator()
+        self.language_dict = self.translator.get_supported_languages(as_dict=True).items()
         self.sourceLang = ""
-        self.desLang = ""
+        self.destinationLang = ""
         self.transText = ""
 
     def main_menu(self):
+        """Display the main menu and handle user input."""
         self.cls()
         self.print_header()
         self.checkinput()
 
     def cls(self):
+        """Clear the screen."""
         os.system('cls' if os.name == 'nt' else 'clear')
 
     def checkinput(self):
+        """Check user input and perform corresponding actions."""
         userInput = input("Enter your choice: ")
 
-        if userInput == "1":
-            self.listLanguages()
-        elif userInput == "2":
-            self.setSourceLang()
-        elif userInput == "3":
-            self.setDesLang()
-        elif userInput == "4":
-            self.translate()
-        elif userInput == "5":
-            exit()
-        else:
-            self.main_menu()
+        match userInput:
+            case "1":
+                self.listLanguages()
+            case "2":
+                self.set_language("source")
+            case "3":
+                self.set_language("destination")
+            case "4":
+                self.translate()
+            case "5":
+                exit()
+            case _:
+                self.main_menu()
 
     def listLanguages(self):
+        """List available languages."""
         self.cls()
         print("Available languages:")
         for language, abbreviation in self.language_dict:
             print(f"{abbreviation}: {language}")
         print()
-        print("Press any key to continue...")
-        input()  # Wait for user input
+        input("Press Enter to continue...")
         self.main_menu()
 
     def find_language_name(self, language_code):
+        """Find the language name from its code."""
         for language, abbreviation in self.language_dict:
             if abbreviation == language_code:
                 return language
         return "Not set"
 
-    def setSourceLang(self):
+    def set_language(self, lang_type):
+        """Set the source or destination language."""
         self.cls()
-        print("Enter source language code (e.g.: en, fr, es, de, ...):")
-        sourceLang = input()
+        lang_type_str = "source" if lang_type == "source" else "destination"
+        lang_code_input = input(f"Enter {lang_type_str} language code (e.g.: en, fr, es, de, ...): ")
 
-        matchFound = False
-        for code, lang in self.language_dict:
-            if code == sourceLang or lang == sourceLang or lang.lower() == sourceLang.lower():
-                matchFound = True
-                self.sourceLang = sourceLang
+        match_found = False
+        for lang, code in self.language_dict:
+            if code.lower() == lang_code_input.lower():
+                match_found = True
+                setattr(self, lang_type_str + "Lang", lang_code_input)
                 break
 
-        if not matchFound:
+        if not match_found:
             print("No language code found!\n")
-            choice = 0
-            while choice != "1" and choice != "2":
-                choice = input("Press 1 to retry or 2 to exit to main!\n")
-
+            choice = input("Press 1 to retry or 2 to exit to main: ")
             if choice == "1":
-                self.setSourceLang()
-            elif choice == "2":
-                self.main_menu()
-
-        self.main_menu()
-
-    def setDesLang(self):
-        self.cls()
-        print("Enter destination language code (e.g., en, fr, es):")
-        desLang = input()
-
-        matchFound = False
-        for code, lang in self.language_dict:
-            if code == desLang or lang == desLang or lang.lower() == desLang.lower():
-                matchFound = True
-                self.desLang = desLang
-                break
-
-        if not matchFound:
-            print("No language code found!\n")
-            choice = 0
-            while choice != "1" and choice != "2":
-                choice = input("Press 1 to retry or 2 to exit to main!\n")
-
-            if choice == "1":
-                self.setDesLang()
+                self.set_language(lang_type)
             elif choice == "2":
                 self.main_menu()
 
         self.main_menu()
 
     def translate(self):
-        if self.sourceLang == "" or self.desLang == "":
+        """Translate text from source to destination language."""
+        if not self.sourceLang or not self.destinationLang:
             self.cls()
             print("You have to set source and destination Language first!")
-            print("Press any key to continue...")
-            input()  # Wait for user input
+            input("Press any key to continue...")
             self.main_menu()
 
         self.cls()
         print("Enter the text to translate:")
         transText = input()
         sourceLang = self.sourceLang
-        desLang = self.desLang
+        destinationLang = self.destinationLang
 
         try:
-            result = GoogleTranslator(source=sourceLang, target=desLang).translate(text=transText)
-            print()
-            print("Translated text:")
+            result = self.translator.translate(text=transText, ssource=sourceLang, target=destinationLang)
+            print("\nTranslated text:")
             print(result)
         except Exception as e:
             print("\nAn error occurred during translation:", e)
@@ -128,6 +106,7 @@ class TranslatorApp:
         self.main_menu()
 
     def print_header(self):
+        """Print the header with menu options and current language settings."""
         header_text = [
             "------------------------------------------------------",
             "       Welcome to this simple translator API.",
@@ -139,19 +118,13 @@ class TranslatorApp:
             "       5. To exit.",
             "",
             f"       Current Source Language: {self.find_language_name(self.sourceLang)}",
-            f"       Current Destination Language: {self.find_language_name(self.desLang)}",
+            f"       Current Destination Language: {self.find_language_name(self.destinationLang)}",
             "------------------------------------------------------"
         ]
-
-        # Find the maximum length of the text lines
-        max_length = len(header_text[1])  # Using the length of the template line for alignment
 
         # Print the header with right-aligned '#'
         for line in header_text:
             print(line)
-
-
-
 
 def main():
     app = TranslatorApp()
