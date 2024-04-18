@@ -1,6 +1,6 @@
-# Simple Translator API
+# Simple Translator with Deep Translator module
 
-This is a simple translator API that allows users to translate text between different languages using Google Translate. Users can list available languages, define source and destination languages, and start translating text.
+This is a simple translator that allows users to translate text between different languages using Google Translater from Deep Translator module. Users can list available languages, define source and destination languages, and start translating text.
 
 ## Requirements
 
